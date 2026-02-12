@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Management Hub</title>
+    <style>
+        :root {
+            --color-primary: #0284c7;
+            --color-primary-hover: #0369a1;
+            --color-bg-base: #ffffff;
+            --color-bg-elevated: #f8fafc;
+            --color-bg-surface: #f1f5f9;
+            --color-text-primary: #0f172a;
+            --color-text-secondary: #475569;
+            --color-text-muted: #64748b;
+            --color-border: #e2e8f0;
+            --color-success: #16a34a;
+            --color-warning: #ea580c;
+            --color-error: #dc2626;
+            --color-success-bg: #dcfce7;
+            --color-warning-bg: #fed7aa;
+            --color-error-bg: #fee2e2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--color-bg-base);
+            color: var(--color-text-primary);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ===== LAYOUT ===== */
+        .header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #0369a1 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        /* ===== LOGIN SCREEN ===== */
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--color-primary) 0%, #0369a1 100%);
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card h2 {
+            margin-bottom: 30px;
+            text-align: center;
+            color: var(--color-primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--color-bg-surface);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-border);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .btn-danger {
+            background: var(--color-error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-success {
+            background: var(--color-success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #15803d;
+        }
+
+        /* ===== DASHBOARD LAYOUT ===== */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--color-text-primary);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--color-text-muted);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--color-bg-surface);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--color-success);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===== TABLES ===== */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--color-bg-surface);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: var(--color-bg-elevated);
+        }
+
+        /* ===== STATUS BADGES ===== */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-pending {
+            background: var(--color-warning-bg);
+            color: #92400e;
+        }
+
+        .badge-completed {
+            background: var(--color-success-bg);
+            color: #166534;
+        }
+
+        .badge-in-progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* ===== FORMS ===== */
+        .form-section {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-section h3 {
+            margin-bottom: 20px;
+            color: var(--color-text-primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--color-text-primary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        /* ===== UTILITY ===== */
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-muted {
+            color: var(--color-text-muted);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .gap-10 {
+            gap: 10px;
+        }
+
+        .gap-20 {
+            gap: 20px;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        /* ===== AI AGENT CHATBOT ===== */
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        .chatbot-toggle:hover {
+            background: var(--color-primary-hover);
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4);
+        }
+
+        .chatbot-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 400px;
+            height: 600px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+            overflow: hidden;
+        }
+
+        .chatbot-container.active {
+            display: flex;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #0369a1 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .chatbot-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .chatbot-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: var(--color-bg-elevated);
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.agent {
+            justify-content: flex-start;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-bubble {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.user .message-bubble {
+            background: var(--color-primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.agent .message-bubble {
+            background: var(--color-bg-surface);
+            color: var(--color-text-primary);
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--color-border);
+        }
+
+        .chatbot-input-area {
+            padding: 15px;
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chatbot-input-area input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .chatbot-input-area input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+
+        .chatbot-send-btn {
+            padding: 10px 16px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .chatbot-send-btn:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .chatbot-suggestions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            padding: 10px 0;
+        }
+
+        .suggestion-btn {
+            padding: 10px;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            transition: all 0.2s;
+            text-align: center;
+            width: 100%;
+        }
+
+        .suggestion-btn:hover {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            td, th {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="loginScreen" class="login-screen">
+    <div class="login-card">
+        <h2>Team Management Hub</h2>
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="loginName" placeholder="Your name" required>
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select id="loginRole" required>
+                    <option value="">Select your role</option>
+                    <option value="boss">Boss (Manage your team)</option>
+                    <option value="team">Team Member (Complete tasks)</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+</div>
+
+<!-- ===== COMMANDER DASHBOARD ===== -->
+<div id="commanderDashboard" class="dashboard">
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1>Commander Dashboard</h1>
+                <div class="user-info">
+                    <span id="commanderUserName"></span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Overview Stats -->
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-title">Total Bosses</div>
+                <div class="stat-value" id="totalBosses">0</div>
+                <div class="stat-label">Managing teams</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Team Members</div>
+                <div class="stat-value" id="totalTeamMembers">0</div>
+                <div class="stat-label">Across all teams</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Tasks Completed</div>
+                <div class="stat-value" id="tasksCompletedCmd">0</div>
+                <div class="stat-label">This period</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Completion Rate</div>
+                <div class="stat-value" id="completionRateCmd">0%</div>
+                <div class="stat-label">Overall progress</div>
+            </div>
+        </div>
+
+        <!-- Bosses Overview -->
+        <div class="form-section">
+            <h3>Team Performance Overview</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Boss Name</th>
+                            <th>Team Size</th>
+                            <th>Tasks Assigned</th>
+                            <th>Tasks Completed</th>
+                            <th>Completion Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bossesTableBody">
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No data yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- All Tasks View -->
+        <div class="form-section">
+            <h3>All Tasks Across Organization</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Task Title</th>
+                            <th>Assigned To</th>
+                            <th>Boss</th>
+                            <th>Status</th>
+                            <th>Completed Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allTasksTableBody">
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No tasks yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== BOSS DASHBOARD ===== -->
+<div id="bossDashboard" class="dashboard">
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1>Boss Dashboard</h1>
+                <div class="user-info">
+                    <span id="bossUserName"></span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Overview Stats -->
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-title">Team Members</div>
+                <div class="stat-value" id="teamMemberCount">0</div>
+                <div class="stat-label">On your team</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Active Tasks</div>
+                <div class="stat-value" id="activeTasks">0</div>
+                <div class="stat-label">Assigned to team</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Completed Tasks</div>
+                <div class="stat-value" id="tasksCompletedBoss">0</div>
+                <div class="stat-label">This period</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Team Completion Rate</div>
+                <div class="stat-value" id="completionRateBoss">0%</div>
+                <div class="stat-label">Overall team progress</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('manageteam', 'boss')">Manage Team</button>
+            <button class="tab-btn" onclick="switchTab('standards', 'boss')">Standards & Elements</button>
+            <button class="tab-btn" onclick="switchTab('assigntask', 'boss')">Assign Task</button>
+            <button class="tab-btn" onclick="switchTab('taskoverview', 'boss')">Task Overview</button>
+            <button class="tab-btn" onclick="switchTab('reviews', 'boss')">Reviews</button>
+        </div>
+
+        <!-- Manage Team Tab -->
+        <div id="manageteam" class="tab-content active">
+            <div class="form-section">
+                <div class="flex justify-between items-center mb-20">
+                    <h3>Team Members</h3>
+                    <button class="btn btn-primary btn-small" onclick="openAddTeamMemberModal()">+ Add Member</button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Tasks Assigned</th>
+                                <th>Tasks Completed</th>
+                                <th>Completion Rate</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teamMembersTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No team members yet. Add one to get started.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Standards & Elements Tab -->
+        <div id="standards" class="tab-content">
+            <div class="form-section">
+                <h3>Performance Standards & Elements</h3>
+                <p class="text-muted" style="margin-bottom: 20px; font-size: 13px;">Define performance standards and elements for each team member. The AI agent will use these to generate personalized tasks during each rating cycle.</p>
+                
+                <div class="form-group">
+                    <label>Select Team Member</label>
+                    <select id="standardsMemberSelect" onchange="loadMemberStandards()">
+                        <option value="">Choose a team member...</option>
+                    </select>
+                </div>
+
+                <div id="standardsFormContainer" style="display: none;">
+                    <div class="form-section">
+                        <h3 id="selectedMemberName" style="color: var(--color-primary); margin-bottom: 20px;"></h3>
+                        
+                        <!-- Elements List -->
+                        <div class="form-section" style="background: var(--color-bg-elevated);">
+                            <h4 style="margin-bottom: 15px;">Performance Elements</h4>
+                            <div id="elementsList" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                                <!-- Elements will be rendered here -->
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="addNewElement()">+ Add Element</button>
+                        </div>
+
+                        <!-- Standards for each element -->
+                        <div id="standardsContainer" style="margin-top: 20px;">
+                            <!-- Standards will be rendered here -->
+                        </div>
+
+                        <div style="margin-top: 20px; display: flex; gap: 10px;">
+                            <button class="btn btn-primary" onclick="saveMemberStandards()">Save Standards</button>
+                            <button class="btn btn-secondary" onclick="generateTasksForMember()">🤖 Generate Tasks (AI)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assign Task Tab -->
+        <div id="assigntask" class="tab-content">
+            <div class="form-section">
+                <h3>Create & Assign Task</h3>
+                <form onsubmit="handleAssignTask(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Task Title</label>
+                            <input type="text" id="taskTitle" placeholder="Task name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Assign To</label>
+                            <select id="assignToMember" required>
+                                <option value="">Select team member</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="taskDescription" placeholder="Task details..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Due Date</label>
+                            <input type="date" id="taskDueDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <select id="taskPriority">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Assign Task</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Task Overview Tab -->
+        <div id="taskoverview" class="tab-content">
+            <div class="form-section">
+                <h3>All Tasks</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Task Title</th>
+                                <th>Assigned To</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Due Date</th>
+                                <th>Completed Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allTasksOverviewBody">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No tasks assigned yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Tab -->
+        <div id="reviews" class="tab-content">
+            <div class="form-section">
+                <h3>Team Member Reviews</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Team Member</th>
+                                <th>Tasks Completed</th>
+                                <th>On-Time Completion %</th>
+                                <th>Average Quality Rating</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewsTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No review data yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Add Review Form -->
+            <div class="form-section mt-20">
+                <h3>Add Performance Review</h3>
+                <form onsubmit="handleAddReview(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Team Member</label>
+                            <select id="reviewMember" required>
+                                <option value="">Select team member</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Review Type</label>
+                            <select id="reviewType" required>
+                                <option value="">Select type</option>
+                                <option value="midterm">Mid-Term Review</option>
+                                <option value="annual">Annual Review</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Quality Rating (1-5)</label>
+                        <select id="qualityRating" required>
+                            <option value="">Select rating</option>
+                            <option value="1">1 - Needs Improvement</option>
+                            <option value="2">2 - Below Average</option>
+                            <option value="3">3 - Average</option>
+                            <option value="4">4 - Good</option>
+                            <option value="5">5 - Excellent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Comments</label>
+                        <textarea id="reviewComments" placeholder="Review comments..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TEAM MEMBER DASHBOARD ===== -->
+<div id="teamMemberDashboard" class="dashboard">
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1>My Tasks</h1>
+                <div class="user-info">
+                    <span id="teamUserName"></span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Overview Stats -->
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-title">Total Tasks</div>
+                <div class="stat-value" id="totalTasksTeam">0</div>
+                <div class="stat-label">Assigned to you</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Tasks Completed</div>
+                <div class="stat-value" id="tasksCompletedTeam">0</div>
+                <div class="stat-label">Finished</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Pending Tasks</div>
+                <div class="stat-value" id="pendingTasks">0</div>
+                <div class="stat-label">Waiting</div>
+            </div>
+            <div class="card">
+                <div class="card-title">My Completion Rate</div>
+                <div class="stat-value" id="myCompletionRate">0%</div>
+                <div class="stat-label">Overall progress</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('activetasks', 'team')">Active Tasks</button>
+            <button class="tab-btn" onclick="switchTab('completedtasks', 'team')">Completed Tasks</button>
+            <button class="tab-btn" onclick="switchTab('myreviews', 'team')">My Reviews</button>
+        </div>
+
+        <!-- Active Tasks Tab -->
+        <div id="activetasks" class="tab-content active">
+            <div class="form-section">
+                <h3>Your Active Tasks</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Task Title</th>
+                                <th>Description</th>
+                                <th>Priority</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activeTasksBody">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No active tasks</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Tasks Tab -->
+        <div id="completedtasks" class="tab-content">
+            <div class="form-section">
+                <h3>Completed Tasks History</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Task Title</th>
+                                <th>Completed Date</th>
+                                <th>Time to Complete</th>
+                            </tr>
+                        </thead>
+                        <tbody id="completedTasksBody">
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">No completed tasks yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Reviews Tab -->
+        <div id="myreviews" class="tab-content">
+            <div class="form-section">
+                <h3>Your Performance Reviews</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Review Type</th>
+                                <th>Quality Rating</th>
+                                <th>Date</th>
+                                <th>Comments</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myReviewsBody">
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No reviews yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ADD TEAM MEMBER MODAL ===== -->
+<div id="addTeamMemberModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add Team Member</h2>
+        </div>
+        <form onsubmit="handleAddTeamMember(event)">
+            <div class="form-group">
+                <label>Member Name</label>
+                <input type="text" id="newMemberName" placeholder="Full name" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeAddTeamMemberModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Member</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===== AI AGENT CHATBOT ===== -->
+<button class="chatbot-toggle" onclick="toggleChatbot()" title="AI Assistant">💬</button>
+
+<div id="chatbotContainer" class="chatbot-container">
+    <div class="chatbot-header">
+        <h3>Task Assistant</h3>
+        <button class="chatbot-close" onclick="toggleChatbot()">✕</button>
+    </div>
+    <div class="chatbot-messages" id="chatbotMessages">
+        <div class="message agent">
+            <div class="message-bubble">
+                👋 Hi! I'm your Task Assistant. I can help you with task management, provide suggestions, and answer questions about your work. How can I help you today?
+            </div>
+        </div>
+    </div>
+    <div class="chatbot-input-area">
+        <input type="text" id="chatbotInput" placeholder="Ask me anything..." onkeypress="handleChatbotKeypress(event)">
+        <button class="chatbot-send-btn" onclick="sendChatbotMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    // ===== DATA STORAGE =====
+    const app = {
+        currentUser: null,
+        currentRole: null,
+        data: {
+            commanders: [],
+            bosses: [],
+            teamMembers: [],
+            tasks: [],
+            completedTasks: [],
+            reviews: [],
+            performanceStandards: []
+        }
+    };
+
+    // Initialize local storage
+    function initializeApp() {
+        const stored = localStorage.getItem('teamAppData');
+        if (stored) {
+            app.data = JSON.parse(stored);
+        }
+    }
+
+    // Save to local storage
+    function saveData() {
+        localStorage.setItem('teamAppData', JSON.stringify(app.data));
+    }
+
+    // ===== LOGIN FLOW =====
+    function handleLogin(event) {
+        event.preventDefault();
+        const name = document.getElementById('loginName').value;
+        const role = document.getElementById('loginRole').value;
+
+        app.currentUser = name;
+        app.currentRole = role;
+
+        // Store user in their role list if new
+        if (role === 'boss' && !app.data.bosses.find(b => b.name === name)) {
+            app.data.bosses.push({ name, teamMembers: [] });
+        }
+
+        saveData();
+        showDashboard(role);
+    }
+
+    function logout() {
+        app.currentUser = null;
+        app.currentRole = null;
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.querySelectorAll('.dashboard').forEach(d => d.classList.remove('active'));
+        document.getElementById('loginName').value = '';
+        document.getElementById('loginRole').value = '';
+    }
+
+    function showDashboard(role) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.querySelectorAll('.dashboard').forEach(d => d.classList.remove('active'));
+
+        if (role === 'boss') {
+            document.getElementById('bossDashboard').classList.add('active');
+            document.getElementById('bossUserName').textContent = app.currentUser;
+            updateBossDashboard();
+        } else if (role === 'team') {
+            document.getElementById('teamMemberDashboard').classList.add('active');
+            document.getElementById('teamUserName').textContent = app.currentUser;
+            updateTeamMemberDashboard();
+        }
+    }
+
+    // ===== COMMANDER DASHBOARD =====
+    function updateCommanderDashboard() {
+        const totalBosses = app.data.bosses.length;
+        const totalMembers = app.data.teamMembers.length;
+        const completed = app.data.completedTasks.length;
+        const total = app.data.tasks.length + completed;
+        const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+        document.getElementById('totalBosses').textContent = totalBosses;
+        document.getElementById('totalTeamMembers').textContent = totalMembers;
+        document.getElementById('tasksCompletedCmd').textContent = completed;
+        document.getElementById('completionRateCmd').textContent = rate + '%';
+
+        // Update bosses table
+        const tbody = document.getElementById('bossesTableBody');
+        if (app.data.bosses.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No bosses yet</td></tr>';
+        } else {
+            tbody.innerHTML = app.data.bosses.map(boss => {
+                const teamMembers = app.data.teamMembers.filter(m => m.bossName === boss.name);
+                const teamTasks = app.data.tasks.filter(t => t.bossName === boss.name);
+                const completedByTeam = app.data.completedTasks.filter(t => t.bossName === boss.name);
+                const rate = (teamTasks.length + completedByTeam.length) > 0 
+                    ? Math.round((completedByTeam.length / (teamTasks.length + completedByTeam.length)) * 100) 
+                    : 0;
+
+                return `
+                    <tr>
+                        <td>${boss.name}</td>
+                        <td>${teamMembers.length}</td>
+                        <td>${teamTasks.length}</td>
+                        <td>${completedByTeam.length}</td>
+                        <td>${rate}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Update all tasks table
+        const allTasksBody = document.getElementById('allTasksTableBody');
+        const allTasks = [...app.data.tasks, ...app.data.completedTasks];
+        if (allTasks.length === 0) {
+            allTasksBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No tasks yet</td></tr>';
+        } else {
+            allTasksBody.innerHTML = allTasks.map(task => {
+                const status = app.data.completedTasks.find(t => t.id === task.id) ? 'Completed' : 'Pending';
+                const completedTask = app.data.completedTasks.find(t => t.id === task.id);
+                return `
+                    <tr>
+                        <td>${task.title}</td>
+                        <td>${task.assignedTo}</td>
+                        <td>${task.bossName}</td>
+                        <td><span class="badge badge-${status.toLowerCase()}">${status}</span></td>
+                        <td>${completedTask ? completedTask.completedDate : '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+    }
+
+    // ===== BOSS DASHBOARD =====
+    function updateBossDashboard() {
+        const myTeam = app.data.teamMembers.filter(m => m.bossName === app.currentUser);
+        const myTasks = app.data.tasks.filter(t => t.bossName === app.currentUser);
+        const myCompleted = app.data.completedTasks.filter(t => t.bossName === app.currentUser);
+
+        document.getElementById('teamMemberCount').textContent = myTeam.length;
+        document.getElementById('activeTasks').textContent = myTasks.length;
+        document.getElementById('tasksCompletedBoss').textContent = myCompleted.length;
+
+        const rate = (myTasks.length + myCompleted.length) > 0 
+            ? Math.round((myCompleted.length / (myTasks.length + myCompleted.length)) * 100) 
+            : 0;
+        document.getElementById('completionRateBoss').textContent = rate + '%';
+
+        // Update team members table
+        const tbody = document.getElementById('teamMembersTableBody');
+        if (myTeam.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No team members yet</td></tr>';
+        } else {
+            tbody.innerHTML = myTeam.map(member => {
+                const memberTasks = app.data.tasks.filter(t => t.assignedTo === member.name);
+                const memberCompleted = app.data.completedTasks.filter(t => t.assignedTo === member.name);
+                const rate = (memberTasks.length + memberCompleted.length) > 0 
+                    ? Math.round((memberCompleted.length / (memberTasks.length + memberCompleted.length)) * 100) 
+                    : 0;
+
+                return `
+                    <tr>
+                        <td>${member.name}</td>
+                        <td>${memberTasks.length + memberCompleted.length}</td>
+                        <td>${memberCompleted.length}</td>
+                        <td>${rate}%</td>
+                        <td><button class="btn btn-small btn-secondary" onclick="removeMember('${member.name}')">Remove</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Update assign to dropdown
+        const select = document.getElementById('assignToMember');
+        select.innerHTML = '<option value="">Select team member</option>' + 
+            myTeam.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+
+        // Update task overview
+        const allTasksBody = document.getElementById('allTasksOverviewBody');
+        const allBossTasks = [...myTasks, ...myCompleted];
+        if (allBossTasks.length === 0) {
+            allTasksBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No tasks assigned yet</td></tr>';
+        } else {
+            allTasksBody.innerHTML = allBossTasks.map(task => {
+                const isCompleted = app.data.completedTasks.find(t => t.id === task.id);
+                const status = isCompleted ? 'Completed' : 'Pending';
+                return `
+                    <tr>
+                        <td>${task.title}</td>
+                        <td>${task.assignedTo}</td>
+                        <td><span class="badge badge-${status.toLowerCase()}">${status}</span></td>
+                        <td>${task.priority}</td>
+                        <td>${task.dueDate || '-'}</td>
+                        <td>${isCompleted ? isCompleted.completedDate : '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Update review member dropdown
+        const reviewSelect = document.getElementById('reviewMember');
+        reviewSelect.innerHTML = '<option value="">Select team member</option>' + 
+            myTeam.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+
+        // Update reviews table
+        const reviewsBody = document.getElementById('reviewsTableBody');
+        const memberReviews = myTeam.map(member => {
+            const reviews = app.data.reviews.filter(r => r.memberName === member.name && r.bossName === app.currentUser);
+            if (reviews.length === 0) {
+                return `<tr><td>${member.name}</td><td>-</td><td>-</td><td>-</td><td>No reviews</td></tr>`;
+            }
+            const avgRating = (reviews.reduce((sum, r) => sum + parseInt(r.rating), 0) / reviews.length).toFixed(1);
+            return `<tr><td>${member.name}</td><td>${app.data.completedTasks.filter(t => t.assignedTo === member.name).length}</td><td>-</td><td>${avgRating}</td><td>View</td></tr>`;
+        });
+        reviewsBody.innerHTML = memberReviews.join('');
+    }
+
+    // ===== TEAM MEMBER DASHBOARD =====
+    function updateTeamMemberDashboard() {
+        const myActiveTasks = app.data.tasks.filter(t => t.assignedTo === app.currentUser);
+        const myCompletedTasks = app.data.completedTasks.filter(t => t.assignedTo === app.currentUser);
+
+        document.getElementById('totalTasksTeam').textContent = myActiveTasks.length + myCompletedTasks.length;
+        document.getElementById('tasksCompletedTeam').textContent = myCompletedTasks.length;
+        document.getElementById('pendingTasks').textContent = myActiveTasks.length;
+
+        const rate = (myActiveTasks.length + myCompletedTasks.length) > 0 
+            ? Math.round((myCompletedTasks.length / (myActiveTasks.length + myCompletedTasks.length)) * 100) 
+            : 0;
+        document.getElementById('myCompletionRate').textContent = rate + '%';
+
+        // Update active tasks
+        const activeBody = document.getElementById('activeTasksBody');
+        if (myActiveTasks.length === 0) {
+            activeBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No active tasks</td></tr>';
+        } else {
+            activeBody.innerHTML = myActiveTasks.map(task => `
+                <tr>
+                    <td>${task.title}</td>
+                    <td>${task.description || '-'}</td>
+                    <td><span class="badge badge-${task.priority}">${task.priority}</span></td>
+                    <td>${task.dueDate || '-'}</td>
+                    <td><span class="badge badge-in-progress">In Progress</span></td>
+                    <td><button class="btn btn-small btn-success" onclick="completeTask('${task.id}')">Complete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        // Update completed tasks
+        const completedBody = document.getElementById('completedTasksBody');
+        if (myCompletedTasks.length === 0) {
+            completedBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No completed tasks yet</td></tr>';
+        } else {
+            completedBody.innerHTML = myCompletedTasks.map(task => {
+                const original = app.data.tasks.find(t => t.id === task.id) || {};
+                const daysToComplete = task.completedDate ? '~' : '-';
+                return `
+                    <tr>
+                        <td>${task.title}</td>
+                        <td>${task.completedDate}</td>
+                        <td>${daysToComplete}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Update my reviews
+        const myReviewsBody = document.getElementById('myReviewsBody');
+        const myReviews = app.data.reviews.filter(r => r.memberName === app.currentUser);
+        if (myReviews.length === 0) {
+            myReviewsBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No reviews yet</td></tr>';
+        } else {
+            myReviewsBody.innerHTML = myReviews.map(review => `
+                <tr>
+                    <td>${review.type}</td>
+                    <td>${review.rating}/5</td>
+                    <td>${review.date}</td>
+                    <td>${review.comments}</td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    // ===== TASK MANAGEMENT =====
+    function handleAssignTask(event) {
+        event.preventDefault();
+
+        const task = {
+            id: 'task_' + Date.now(),
+            title: document.getElementById('taskTitle').value,
+            description: document.getElementById('taskDescription').value,
+            assignedTo: document.getElementById('assignToMember').value,
+            bossName: app.currentUser,
+            priority: document.getElementById('taskPriority').value,
+            dueDate: document.getElementById('taskDueDate').value,
+            createdDate: new Date().toISOString().split('T')[0]
+        };
+
+        app.data.tasks.push(task);
+        saveData();
+        updateBossDashboard();
+
+        // Reset form
+        event.target.reset();
+        switchTab('taskoverview', 'boss');
+    }
+
+    function completeTask(taskId) {
+        const taskIndex = app.data.tasks.findIndex(t => t.id === taskId);
+        if (taskIndex !== -1) {
+            const task = app.data.tasks.splice(taskIndex, 1)[0];
+            app.data.completedTasks.push({
+                ...task,
+                completedDate: new Date().toISOString().split('T')[0]
+            });
+            saveData();
+            updateTeamMemberDashboard();
+            updateBossDashboard();
+        }
+    }
+
+    // ===== TEAM MEMBER MANAGEMENT =====
+    function openAddTeamMemberModal() {
+        document.getElementById('addTeamMemberModal').classList.add('active');
+    }
+
+    function closeAddTeamMemberModal() {
+        document.getElementById('addTeamMemberModal').classList.remove('active');
+        document.getElementById('newMemberName').value = '';
+    }
+
+    function handleAddTeamMember(event) {
+        event.preventDefault();
+        const name = document.getElementById('newMemberName').value;
+
+        if (!app.data.teamMembers.find(m => m.name === name && m.bossName === app.currentUser)) {
+            app.data.teamMembers.push({
+                name,
+                bossName: app.currentUser
+            });
+            saveData();
+            updateBossDashboard();
+            updateStandardsMemberSelect();
+        }
+
+        closeAddTeamMemberModal();
+    }
+
+    function removeMember(memberName) {
+        app.data.teamMembers = app.data.teamMembers.filter(m => !(m.name === memberName && m.bossName === app.currentUser));
+        saveData();
+        updateBossDashboard();
+    }
+
+    // ===== REVIEWS =====
+    function handleAddReview(event) {
+        event.preventDefault();
+
+        const review = {
+            id: 'review_' + Date.now(),
+            memberName: document.getElementById('reviewMember').value,
+            bossName: app.currentUser,
+            type: document.getElementById('reviewType').value,
+            rating: document.getElementById('qualityRating').value,
+            comments: document.getElementById('reviewComments').value,
+            date: new Date().toISOString().split('T')[0]
+        };
+
+        app.data.reviews.push(review);
+        saveData();
+        updateBossDashboard();
+        event.target.reset();
+    }
+
+    // ===== TAB SWITCHING =====
+    function switchTab(tabName, role) {
+        // Hide all tabs in the role
+        document.querySelectorAll(`#${role}Dashboard .tab-content`).forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll(`#${role}Dashboard .tab-btn`).forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Show selected tab
+        const tabElement = document.getElementById(tabName);
+        if (tabElement) {
+            tabElement.classList.add('active');
+            event.target.classList.add('active');
+        }
+    }
+
+    // ===== AI AGENT CHATBOT =====
+    const agentResponses = {
+        task: {
+            keywords: ['task', 'create', 'assign', 'complete', 'due', 'deadline'],
+            responses: [
+                'I can help you manage tasks! You can create tasks, assign them to team members, and track progress. What would you like to do?',
+                'Need to create a task? I can guide you through the process. Or would you like tips on task organization?',
+                'Tasks are the core of task management. You can assign them with priority levels and due dates. What task do you need help with?'
+            ],
+            quickAction: true,
+            actionType: 'createTask'
+        },
+        team: {
+            keywords: ['team', 'member', 'add', 'remove', 'manage', 'people'],
+            responses: [
+                'Team management is important! You can add team members, view their progress, and evaluate their performance. Would you like to add someone?',
+                'Great teams drive success! You can manage your team members and see their task completion rates. Need help adding someone?',
+                'Your team is your strength. You can track individual performance, completion rates, and provide reviews. What team task can I help with?'
+            ]
+        },
+        review: {
+            keywords: ['review', 'performance', 'rating', 'feedback', 'evaluation'],
+            responses: [
+                'Performance reviews are great for growth! You can rate team members, provide feedback, and track their development over time.',
+                'Reviews help recognize great work! I can help you write meaningful reviews that motivate your team.',
+                'Consistent feedback drives improvement. You can conduct mid-term and annual reviews with quality ratings.'
+            ]
+        },
+        dashboard: {
+            keywords: ['dashboard', 'stats', 'metrics', 'progress', 'overview', 'completion'],
+            responses: [
+                'Your dashboard gives you a complete overview of your work! It shows key metrics like completion rates, tasks, and team performance.',
+                'The dashboard is your command center. You can see at a glance how your team and tasks are progressing.',
+                'All your important metrics are on the dashboard - completion rates, task counts, team size, and progress indicators.'
+            ]
+        },
+        help: {
+            keywords: ['help', 'how', 'guide', 'tutorial', 'explain', 'what', 'do i'],
+            responses: [
+                'I\'m here to help! I can explain features, suggest next steps, and help you navigate the system. What would you like to know?',
+                'Happy to help! Whether you\'re new or experienced, I can assist with anything from task creation to team management.',
+                'Need guidance? I can walk you through any feature or help you find what you\'re looking for.'
+            ]
+        },
+        greeting: {
+            keywords: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'hello assistant'],
+            responses: [
+                '👋 Hello! I\'m your Task Assistant. How can I help you manage your work today?',
+                '👋 Hi there! Ready to tackle some tasks? I\'m here to help!',
+                '👋 Hey! What can I assist you with today?'
+            ]
+        },
+        thanks: {
+            keywords: ['thanks', 'thank you', 'appreciate', 'grateful', 'good job'],
+            responses: [
+                'You\'re welcome! Let me know if you need any other help.',
+                'Happy to help! Feel free to ask anytime.',
+                'Glad I could assist! Good luck with your tasks! 🚀'
+            ]
+        }
+    };
+
+    function toggleChatbot() {
+        document.getElementById('chatbotContainer').classList.toggle('active');
+    }
+
+    function sendChatbotMessage() {
+        const input = document.getElementById('chatbotInput');
+        const message = input.value.trim();
+
+        if (!message) return;
+
+        // Add user message
+        addChatbotMessage(message, 'user');
+        input.value = '';
+
+        // Generate agent response
+        setTimeout(() => {
+            const response = generateAgentResponse(message);
+            addChatbotMessage(response, 'agent');
+            
+            // If it's a task creation request for a boss, show confirmation options
+            if (isTaskCreationRequest(message) && app.currentRole === 'boss') {
+                const taskDetails = parseTaskFromMessage(message);
+                if (taskDetails.title) {
+                    setTimeout(() => {
+                        const confirmMsg = `Would you like me to create this task now? Title: "${taskDetails.title}" | Priority: ${taskDetails.priority}`;
+                        addChatbotMessage(confirmMsg, 'agent');
+                        addQuickActions(['✓ Create Task', '✏️ Edit Details', '✕ Cancel']);
+                    }, 800);
+                }
+            }
+        }, 500);
+    }
+
+    function addQuickActions(actions) {
+        const messagesDiv = document.getElementById('chatbotMessages');
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'message agent';
+        actionsDiv.innerHTML = `
+            <div class="chatbot-suggestions">
+                ${actions.map((action, idx) => `
+                    <button class="suggestion-btn" onclick="handleQuickAction('${action}')">${action}</button>
+                `).join('')}
+            </div>
+        `;
+        messagesDiv.appendChild(actionsDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function handleQuickAction(action) {
+        const input = document.getElementById('chatbotInput');
+        if (action.includes('Create Task')) {
+            const taskTitle = document.getElementById('taskTitle').value;
+            if (taskTitle) {
+                handleAssignTask(new Event('submit'));
+                addChatbotMessage('✅ Task created successfully!', 'agent');
+                setTimeout(() => {
+                    addChatbotMessage('Your task is now visible in the Task Overview. Would you like to create another task?', 'agent');
+                }, 500);
+            }
+        } else if (action.includes('Edit Details')) {
+            addChatbotMessage('You can edit the task details in the form above. Let me know when you\'re ready!', 'agent');
+        } else if (action.includes('Cancel')) {
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskDescription').value = '';
+            addChatbotMessage('No problem! Just let me know if you need anything else.', 'agent');
+        }
+    }
+
+    function handleChatbotKeypress(event) {
+        if (event.key === 'Enter') {
+            sendChatbotMessage();
+        }
+    }
+
+    function addChatbotMessage(text, sender) {
+        const messagesDiv = document.getElementById('chatbotMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        messageDiv.innerHTML = `<div class="message-bubble">${escapeHtml(text)}</div>`;
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function generateAgentResponse(userMessage) {
+        const lowerMessage = userMessage.toLowerCase();
+
+        // Check if user is trying to create a task
+        if (isTaskCreationRequest(userMessage)) {
+            const taskDetails = parseTaskFromMessage(userMessage);
+            if (taskDetails.title) {
+                if (app.currentRole === 'boss') {
+                    openTaskCreationFromAgent(taskDetails);
+                    return `✅ I found "${taskDetails.title}" in your message. Let me help you create this task!`;
+                } else if (app.currentRole === 'team') {
+                    return `📝 Task creation is available for Bosses. As a team member, you can complete assigned tasks!`;
+                }
+            }
+        }
+
+        // Find matching response category
+        for (const [category, data] of Object.entries(agentResponses)) {
+            for (const keyword of data.keywords) {
+                if (lowerMessage.includes(keyword)) {
+                    const responses = data.responses;
+                    return responses[Math.floor(Math.random() * responses.length)];
+                }
+            }
+        }
+
+        // Get contextual suggestions based on role
+        if (app.currentRole === 'boss') {
+            return getContextualResponse();
+        }
+
+        // Default responses
+        const defaults = [
+            'That\'s a great question! I can help with task management, team coordination, and performance tracking.',
+            'I can assist with that! You might want to check your dashboard for more details about your current tasks and team.',
+            'Not sure about that specifically, but I\'m here to help with tasks, team management, and reviews. What would you like to know?'
+        ];
+        return defaults[Math.floor(Math.random() * defaults.length)];
+    }
+
+    function isTaskCreationRequest(message) {
+        const taskKeywords = ['create', 'add', 'new task', 'assign', 'make', 'need to', 'should', 'remind me', 'task:'];
+        return taskKeywords.some(keyword => message.toLowerCase().includes(keyword));
+    }
+
+    function parseTaskFromMessage(message) {
+        // Extract task information from natural language
+        const details = {
+            title: '',
+            description: '',
+            priority: 'medium',
+            assignedTo: '',
+            dueDate: ''
+        };
+
+        // Try to extract title (usually the main noun phrase)
+        const titleMatch = message.match(/(?:create|add|assign|task|make)\s+(?:a\s+)?(?:task\s+)?(?:for\s+)?"?([^"]+?)"?(?:\s+(?:for|to|assigned?|priority|due|date)|\s*$)/i);
+        if (titleMatch) {
+            details.title = titleMatch[1].trim();
+        }
+
+        // Extract priority
+        if (message.toLowerCase().includes('high priority') || message.toLowerCase().includes('urgent')) {
+            details.priority = 'high';
+        } else if (message.toLowerCase().includes('low priority')) {
+            details.priority = 'low';
+        }
+
+        // Try to extract assignee name
+        const myTeam = app.data.teamMembers.filter(m => m.bossName === app.currentUser);
+        for (const member of myTeam) {
+            if (message.toLowerCase().includes(member.name.toLowerCase())) {
+                details.assignedTo = member.name;
+                break;
+            }
+        }
+
+        // Try to extract due date
+        const dateMatch = message.match(/(?:due|by|deadline)\s+(?:on\s+)?(\d{1,2}\/\d{1,2}|\d{4}-\d{2}-\d{2}|tomorrow|next\s+week|today)/i);
+        if (dateMatch) {
+            details.dueDate = dateMatch[1];
+        }
+
+        return details;
+    }
+
+    function openTaskCreationFromAgent(taskDetails) {
+        // Navigate to boss dashboard if needed
+        if (app.currentRole === 'boss') {
+            switchTab('assigntask', 'boss');
+            
+            // Pre-fill form with extracted details
+            document.getElementById('taskTitle').value = taskDetails.title;
+            document.getElementById('taskDescription').value = taskDetails.description;
+            document.getElementById('taskPriority').value = taskDetails.priority;
+            
+            if (taskDetails.assignedTo) {
+                document.getElementById('assignToMember').value = taskDetails.assignedTo;
+            }
+
+            if (taskDetails.dueDate && taskDetails.dueDate !== '') {
+                // Try to convert date format
+                const dateStr = convertToDateInput(taskDetails.dueDate);
+                if (dateStr) {
+                    document.getElementById('taskDueDate').value = dateStr;
+                }
+            }
+
+            // Scroll to form
+            setTimeout(() => {
+                document.querySelector('form').scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+        }
+    }
+
+    function convertToDateInput(dateStr) {
+        // Convert various date formats to YYYY-MM-DD
+        if (dateStr.includes('-') && dateStr.length === 10) {
+            return dateStr; // Already correct format
+        }
+
+        if (dateStr.toLowerCase() === 'today') {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        if (dateStr.toLowerCase() === 'tomorrow') {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            return tomorrow.toISOString().split('T')[0];
+        }
+
+        if (dateStr.toLowerCase().includes('next week')) {
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            return nextWeek.toISOString().split('T')[0];
+        }
+
+        // Try MM/DD format
+        const slashMatch = dateStr.match(/(\d{1,2})/(\d{1,2})/);
+        if (slashMatch) {
+            const month = slashMatch[1].padStart(2, '0');
+            const day = slashMatch[2].padStart(2, '0');
+            const year = new Date().getFullYear();
+            return `${year}-${month}-${day}`;
+        }
+
+        return '';
+    }
+
+    function getContextualResponse() {
+        const myTeam = app.data.teamMembers.filter(m => m.bossName === app.currentUser);
+        const myTasks = app.data.tasks.filter(t => t.bossName === app.currentUser);
+
+        if (myTeam.length === 0) {
+            return '📌 Pro Tip: You don\'t have any team members yet. Start by adding a team member so you can assign tasks and track progress!';
+        }
+
+        if (myTasks.length === 0) {
+            return '📌 Pro Tip: You have a team but no active tasks! Try assigning some tasks to keep your team engaged and productive.';
+        }
+
+        const completionRate = app.data.tasks.filter(t => t.bossName === app.currentUser).length > 0
+            ? Math.round((app.data.completedTasks.filter(t => t.bossName === app.currentUser).length / 
+                  (app.data.tasks.filter(t => t.bossName === app.currentUser).length + 
+                   app.data.completedTasks.filter(t => t.bossName === app.currentUser).length)) * 100)
+            : 0;
+
+        if (completionRate < 50) {
+            return '📌 Pro Tip: Your team\'s completion rate is below 50%. Consider breaking down large tasks into smaller ones or providing additional support.';
+        }
+
+        return '🎯 Great work! Your team is performing well. Keep up the momentum and continue tracking progress!';
+    }
+
+    // ===== PERFORMANCE STANDARDS & AI TASK GENERATION =====
+    function updateStandardsMemberSelect() {
+        const myTeam = app.data.teamMembers.filter(m => m.bossName === app.currentUser);
+        const select = document.getElementById('standardsMemberSelect');
+        select.innerHTML = '<option value="">Choose a team member...</option>' + 
+            myTeam.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+    }
+
+    function loadMemberStandards() {
+        const memberName = document.getElementById('standardsMemberSelect').value;
+        if (!memberName) {
+            document.getElementById('standardsFormContainer').style.display = 'none';
+            return;
+        }
+
+        document.getElementById('standardsFormContainer').style.display = 'block';
+        document.getElementById('selectedMemberName').textContent = `Standards for ${memberName}`;
+
+        const standards = app.data.performanceStandards.find(s => s.memberName === memberName && s.bossName === app.currentUser) || 
+            { memberName, bossName: app.currentUser, elements: [] };
+
+        renderElements(standards.elements || []);
+    }
+
+    function renderElements(elements) {
+        const elementsList = document.getElementById('elementsList');
+        if (elements.length === 0) {
+            elementsList.innerHTML = '<p class="text-muted">No elements added yet. Add your first performance element.</p>';
+            return;
+        }
+
+        elementsList.innerHTML = elements.map((elem, idx) => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; border-radius: 6px; border: 1px solid var(--color-border);">
+                <div>
+                    <strong>${elem.name}</strong>
+                    <p class="text-muted" style="font-size: 12px; margin: 5px 0 0 0;">${elem.description || 'No description'}</p>
+                </div>
+                <button class="btn btn-small btn-secondary" onclick="removeElement(${idx})">Remove</button>
+            </div>
+        `).join('');
+    }
+
+    function addNewElement() {
+        const name = prompt('Enter performance element name (e.g., "Customer Service", "Technical Skills"):');
+        if (!name) return;
+
+        const description = prompt('Enter a description for this element (optional):');
+        
+        const memberName = document.getElementById('standardsMemberSelect').value;
+        let standards = app.data.performanceStandards.find(s => s.memberName === memberName && s.bossName === app.currentUser);
+        
+        if (!standards) {
+            standards = { memberName, bossName: app.currentUser, elements: [] };
+            app.data.performanceStandards.push(standards);
+        }
+
+        standards.elements.push({ name, description, standards: [] });
+        renderElements(standards.elements);
+        renderStandards(standards.elements);
+    }
+
+    function removeElement(idx) {
+        const memberName = document.getElementById('standardsMemberSelect').value;
+        const standards = app.data.performanceStandards.find(s => s.memberName === memberName && s.bossName === app.currentUser);
+        if (standards) {
+            standards.elements.splice(idx, 1);
+            renderElements(standards.elements);
+            renderStandards(standards.elements);
+        }
+    }
+
+    function renderStandards(elements) {
+        const container = document.getElementById('standardsContainer');
+        if (elements.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = elements.map((elem, elemIdx) => `
+            <div class="form-section" style="background: white;">
+                <h4>${elem.name}</h4>
+                <div id="standards_${elemIdx}" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                    ${(elem.standards || []).map((std, stdIdx) => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--color-bg-elevated); border-radius: 6px;">
+                            <span>${std}</span>
+                            <button class="btn btn-small btn-secondary" onclick="removeStandard(${elemIdx}, ${stdIdx})">Remove</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="standardInput_${elemIdx}" placeholder="Add a standard or expectation..." style="flex: 1; padding: 10px; border: 1px solid var(--color-border); border-radius: 6px; font-size: 14px;">
+                    <button class="btn btn-secondary btn-small" onclick="addStandard(${elemIdx})">Add</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addStandard(elemIdx) {
+        const input = document.getElementById(`standardInput_${elemIdx}`);
+        const standardText = input.value.trim();
+        if (!standardText) return;
+
+        const memberName = document.getElementById('standardsMemberSelect').value;
+        const standards = app.data.performanceStandards.find(s => s.memberName === memberName && s.bossName === app.currentUser);
+        
+        if (standards && standards.elements[elemIdx]) {
+            if (!standards.elements[elemIdx].standards) {
+                standards.elements[elemIdx].standards = [];
+            }
+            standards.elements[elemIdx].standards.push(standardText);
+            input.value = '';
+            renderStandards(standards.elements);
+        }
+    }
+
+    function removeStandard(elemIdx, stdIdx) {
+        const memberName = document.getElementById('standardsMemberSelect').value;
+        const standards = app.data.performanceStandards.find(s => s.memberName === memberName && s.bossName === app.currentUser);
+        
+        if (standards && standards.elements[elemIdx]) {
+            standards.elements[elemIdx].standards.splice(stdIdx, 1);
+            renderStandards(standards.elements);
+        }
+    }
+
+    function saveMemberStandards() {
+        saveData();
+        addChatbotMessage('✅ Standards saved successfully!', 'agent');
+        setTimeout(() => {
+            addChatbotMessage('Now you can generate AI-powered tasks based on these standards for ' + document.getElementById('standardsMemberSelect').value, 'agent');
+        }, 500);
+    }
+
+    function generateTasksForMember() {
+        const memberName = document.getElementById('standardsMemberSelect').value;
+        if (!memberName) {
+            alert('Please select a team member first');
+            return;
+        }
+
+        const standards = app.data.performanceStandards.find(s => s.memberName === memberName && s.bossName === app.currentUser);
+        if (!standards || standards.elements.length === 0) {
+            alert('Please add performance elements and standards first');
+            return;
+        }
+
+        // Generate tasks based on standards
+        const generatedTasks = generateAITasks(memberName, standards.elements);
+        
+        if (generatedTasks.length === 0) {
+            alert('Could not generate tasks. Please ensure standards have descriptions.');
+            return;
+        }
+
+        // Show generated tasks and ask for confirmation
+        const taskSummary = generatedTasks.map(t => `• ${t.title}`).join('\n');
+        const confirm = window.confirm(`Generated ${generatedTasks.length} tasks:\n\n${taskSummary}\n\nAssign these tasks?`);
+
+        if (confirm) {
+            generatedTasks.forEach(task => app.data.tasks.push(task));
+            saveData();
+            updateBossDashboard();
+            addChatbotMessage(`✅ ${generatedTasks.length} tasks generated and assigned to ${memberName}!`, 'agent');
+            switchTab('taskoverview', 'boss');
+        }
+    }
+
+    function generateAITasks(memberName, elements) {
+        const tasks = [];
+        
+        elements.forEach(element => {
+            if (!element.standards || element.standards.length === 0) return;
+
+            // Generate 1-2 tasks per element based on standards
+            element.standards.forEach((standard, idx) => {
+                if (idx >= 2) return; // Max 2 tasks per element
+
+                const task = {
+                    id: 'task_' + Date.now() + Math.random(),
+                    title: generateTaskTitle(element.name, standard),
+                    description: generateTaskDescription(element.name, standard),
+                    assignedTo: memberName,
+                    bossName: app.currentUser,
+                    priority: calculatePriority(element.name),
+                    dueDate: calculateDueDate(),
+                    createdDate: new Date().toISOString().split('T')[0],
+                    generatedFrom: { element: element.name, standard: standard }
+                };
+                tasks.push(task);
+            });
+        });
+
+        return tasks;
+    }
+
+    function generateTaskTitle(element, standard) {
+        const titles = [
+            `Demonstrate: ${element}`,
+            `Execute: ${standard}`,
+            `Improve ${element}`,
+            `Master ${standard}`,
+            `Complete ${element} milestone`,
+            `Achieve ${standard} goal`
+        ];
+        return titles[Math.floor(Math.random() * titles.length)];
+    }
+
+    function generateTaskDescription(element, standard) {
+        return `Performance Element: ${element}\n\nStandard/Expectation: ${standard}\n\nComplete activities that demonstrate proficiency in this area.`;
+    }
+
+    function calculatePriority(element) {
+        const priorities = ['low', 'medium', 'high'];
+        return priorities[Math.floor(Math.random() * priorities.length)];
+    }
+
+    function calculateDueDate() {
+        const date = new Date();
+        date.setDate(date.getDate() + Math.floor(Math.random() * 14) + 7); // 7-21 days from now
+        return date.toISOString().split('T')[0];
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ===== INIT =====
+    initializeApp();
+</script>
+
+</body>
+</html>
